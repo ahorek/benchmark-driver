@@ -106,9 +106,9 @@ class BenchmarkDriver::Runner::Once
       prelude = preludes.reject(&:nil?).reject(&:empty?).join("\n")
       <<-RUBY
 #{prelude}
-__bmdv_before = Time.now
+__bmdv_before = Process.clock_gettime(Process::CLOCK_MONOTONIC)
 #{script}
-__bmdv_after = Time.now
+__bmdv_after = Process.clock_gettime(Process::CLOCK_MONOTONIC)
 File.write(#{result.dump}, (__bmdv_after - __bmdv_before).inspect)
 #{teardown}
       RUBY

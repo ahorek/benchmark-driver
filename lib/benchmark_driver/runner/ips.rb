@@ -171,27 +171,27 @@ class BenchmarkDriver::Runner::Ips
 
 # first warmup
 __bmdv_i = 0
-__bmdv_before = Time.now
+__bmdv_before = Process.clock_gettime(Process::CLOCK_MONOTONIC)
 __bmdv_target = __bmdv_before + #{first_warmup_duration}
-while Time.now < __bmdv_target
+while Process.clock_gettime(Process::CLOCK_MONOTONIC) < __bmdv_target
   #{script}
   __bmdv_i += 1
 end
-__bmdv_after = Time.now
+__bmdv_after = Process.clock_gettime(Process::CLOCK_MONOTONIC)
 
 # second warmup
 __bmdv_ip100ms = (__bmdv_i.to_f / (__bmdv_after - __bmdv_before) / 10.0).ceil
 __bmdv_loops = 0
 __bmdv_duration = 0.0
-__bmdv_target = Time.now + #{second_warmup_duration}
-while Time.now < __bmdv_target
+__bmdv_target = Process.clock_gettime(Process::CLOCK_MONOTONIC) + #{second_warmup_duration}
+while Process.clock_gettime(Process::CLOCK_MONOTONIC) < __bmdv_target
   __bmdv_i = 0
-  __bmdv_before = Time.now
+  __bmdv_before = Process.clock_gettime(Process::CLOCK_MONOTONIC)
   while __bmdv_i < __bmdv_ip100ms
     #{script}
     __bmdv_i += 1
   end
-  __bmdv_after = Time.now
+  __bmdv_after = Process.clock_gettime(Process::CLOCK_MONOTONIC)
 
   __bmdv_loops += __bmdv_i
   __bmdv_duration += (__bmdv_after - __bmdv_before)
@@ -224,9 +224,9 @@ elsif Process.respond_to?(:clock_gettime) # Ruby 2.1+
   #{while_loop('', loop_count)}
   __bmdv_empty_after = Process.clock_gettime(Process::CLOCK_MONOTONIC)
 else
-  __bmdv_empty_before = Time.now
+  __bmdv_empty_before = Process.clock_gettime(Process::CLOCK_MONOTONIC)
   #{while_loop('', loop_count)}
-  __bmdv_empty_after = Time.now
+  __bmdv_empty_after = Process.clock_gettime(Process::CLOCK_MONOTONIC)
 end
 
 if Process.respond_to?(:clock_gettime) # Ruby 2.1+
@@ -234,9 +234,9 @@ if Process.respond_to?(:clock_gettime) # Ruby 2.1+
   #{while_loop(script, loop_count)}
   __bmdv_script_after = Process.clock_gettime(Process::CLOCK_MONOTONIC)
 else
-  __bmdv_script_before = Time.now
+  __bmdv_script_before = Process.clock_gettime(Process::CLOCK_MONOTONIC)
   #{while_loop(script, loop_count)}
-  __bmdv_script_after = Time.now
+  __bmdv_script_after = Process.clock_gettime(Process::CLOCK_MONOTONIC)
 end
 
 #{teardown}
